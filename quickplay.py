@@ -2,7 +2,7 @@
 # CC0 1.0 Universal
 import os
 import subprocess
-from sqlite3 import connect
+
 
 from steam import client as gs
 import json

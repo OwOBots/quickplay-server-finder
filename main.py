@@ -73,8 +73,6 @@ def main():
                     greylist_prompt = input(f"{server_name} is grey-listed because of: {greylist_reason}, do you want to connect to it?")
                     if greylist_prompt == 'y':
                         server_connect()
-                    else:# if the user doesn't want to connect to the server, then we'll try to connect to the next server
-                        server_connect()
                 else:
                     server_connect()
     

@@ -29,15 +29,6 @@ region_names = {
     }
 
 
-def load_blacklist():
-    with open("blacklist.json", "r") as f:
-        return json.load(f)
-
-
-def load_greylist():
-    with open("greylist.json", "r") as f:
-        return json.load(f)
-
 
 def TrueQuickplayServers():
     servers_info = []
@@ -62,24 +53,9 @@ def get_servers():
     try:
         servers = TrueQuickplayServers()
         sorted_servers = sorted(servers, key=lambda x: x["players"], reverse=True)
-        blacklist = load_blacklist()
-        greylist = load_greylist()
         
         selected_server = None
         for server in sorted_servers:
-            server_name = server["name"]
-            # Check if the server name contains any forbidden words
-            if fuzz.partial_ratio(server_name, blacklist) > 80:
-                # If the server name contains any forbidden words, skip it
-                # and continue to the next server
-                # we hide the server name to prevent the user from seeing it
-                # and to prevent the user from connecting to it
-                continue
-            if fuzz.partial_ratio(server_name, greylist) > 80:
-                selected_server = server
-                # greylisted servers are not preferred but are still valid so we will return a warning message instead
-                selected_server["greylisted"] = True
-                break
             if server["players"] < server["max_players"]:
                 selected_server = server
                 selected_server["greylisted"] = False
@@ -132,17 +108,6 @@ def rawjson():
             jsonify({"error": f"An error occurred while processing the data: {e}"}),
             500,
             )
-
-
-@app.route("/xlists")
-def xlists():
-    try:
-        greylist = load_greylist()
-        return render_template("xlists.html", greylist=greylist)
-    except IOError as e:
-        return jsonify({"error": f"An error occurred while reading the file: {e}"}), 500
-    except (KeyError, ValueError) as e:
-        return jsonify({"error": f"An error occurred while processing the data: {e}"}), 500
 
 
 if __name__ == "__main__":

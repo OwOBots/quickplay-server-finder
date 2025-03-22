@@ -1,16 +1,10 @@
-import os
 from flask import Flask, jsonify, request, render_template
-from flask_wtf import CSRFProtect
 from steam import client as gs
 import json
-from fuzzywuzzy import fuzz
+
 
 app = Flask(__name__)
-# Generate a random secret key for CSRF protection
-SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
-csrf = CSRFProtect()
-csrf.init_app(app)
+
 
 limit = 20
 

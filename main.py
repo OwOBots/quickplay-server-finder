@@ -8,6 +8,13 @@ import json
 # change this to the number of servers you want to query
 limit = 20
 
+def load_blacklist():
+    with open('forbidden-words/eng', 'r') as f:
+        return json.load(f)
+
+def load_greylist():
+    with open('greylist.json', 'r') as f:
+        return json.load(f)
 
 def TrueQuickplayServers():
     servers_info = []
@@ -52,14 +59,24 @@ def main():
                 server_name = most_players_server['name']
                 print("Server with the most players:", server_name, "with", player_count, "players online", "at", ip)
                 
-                server_connect_prompt = input("Would you like to connect to this server? (y/N): ")
-                if server_connect_prompt == 'y':
-                    cmd = f"steam://connect/{ip}"
-                    # if the user is on windows, use start
-                    if os.name == 'nt':
-                        subprocess.run(["cmd", "/c", "start", cmd], shell=False)
-                    else:
-                        subprocess.run(["xdg-open", cmd], shell=False)
+                def server_connect():
+                    server_connect_prompt = input("Would you like to connect to this server? (y/N): ")
+                    if server_connect_prompt == 'y':
+                        cmd = f"steam://connect/{ip}"
+                        # if the user is on windows, use start
+                        if os.name == 'nt':
+                            subprocess.run(["cmd", "/c", "start", cmd], shell=False)
+                        else:
+                            subprocess.run(["xdg-open", cmd], shell=False)
+                if server in load_greylist():
+                    greylist_reason = server['Reason']
+                    greylist_prompt = input(f"{server_name} is grey-listed because of: {greylist_reason}, do you want to connect to it?")
+                    if greylist_prompt == 'y':
+                        server_connect()
+                    else:# if the user doesn't want to connect to the server, then we'll try to connect to the next server
+                        server_connect()
+                else:
+                    server_connect()
     
     except IOError as e:
         print(f"An error occurred while reading the file: {e}")

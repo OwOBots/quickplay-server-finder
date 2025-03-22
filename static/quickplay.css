@@ -1,0 +1,56 @@
+/* quickplay.css */
+
+/* font face */
+@font-face {
+    font-family: "dos-v_re_jpn16";
+    src: url("./Web437_DOS-V_re_JPN16.woff") format("woff2");
+    font-display: auto;
+  }
+
+
+body {
+    font-family: dos-v_re_jpn16, sans-serif;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+h1 {
+    color: #ffffffff;
+}
+
+button {
+    background-color: #008000; /* green */
+    border: 1px solid #ddd;
+    color: white;
+    padding: 10px 20px;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#server-info {
+    margin-top: 20px;
+    font inherit;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 300px;
+    text-align: left;
+}
+
+#server-info p {
+    margin: 5px 0;
+    font inherit;
+}

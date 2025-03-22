@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel=stylesheet type=text/css href="static/quickplay.css">
+    <title>True Quickplay Servers</title>
+</head>
+<body>
+    <h1>True Quickplay Servers</h1>
+    <button onclick="fetchServer()">Get Server with Most Players</button>
+    <div id="server-info"></div>
+
+    <script>
+        function fetchServer() {
+            fetch('/servers')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        document.getElementById('server-info').innerText = data.message;
+                    } else {
+                        document.getElementById('server-info').innerHTML = `
+                            <p>Server Name: ${data.name}</p>
+                            <p>Players: ${data.players}</p>
+                            <p>IP: ${data.addr}</p>
+                            <p>Map: ${data.map}</p>
+                            <p>Region: ${data.region}</p>
+                            <p>Greylisted: ${data.greylisted ? 'Yes' : 'No'} ${data.greylisted ? ': Reason ' + data.reason : ''}</p>
+                            <button onclick="connectServer('${data.addr}')">Connect</button>
+                        `;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function connectServer(ip) {
+            fetch('/connect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ip: ip }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                window.open(data.url, '_blank');
+                } else {
+                 alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+    </script>
+</body>
+</html>

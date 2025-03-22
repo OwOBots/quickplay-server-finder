@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw JSON Data</title>
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Raw JSON Data</h1>
+    <pre id="json-data"></pre>
+
+    <script>
+        fetch('/rawjson')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('json-data').innerText = JSON.stringify(data, null, 4);
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

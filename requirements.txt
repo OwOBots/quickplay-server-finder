@@ -3,4 +3,4 @@
 Flask==3.1.0
 Flask-WTF==1.2.2
 fuzzywuzzy==0.18.0
-steam==1.4.4
+steam[client]==1.4.4

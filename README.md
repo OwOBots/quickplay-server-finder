@@ -1,6 +1,6 @@
 # how to use
-run pip install -r requirements.txt
+run `pip install -r requirements.txt`
 
-run py quickplay.py
+run `py main.py`
 
 Thats it

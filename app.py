@@ -1,9 +1,12 @@
 from flask import Flask, jsonify, request, render_template
+from flask_wtf import CSRFProtect
 from steam import client as gs
 import json
 from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 limit = 20
 

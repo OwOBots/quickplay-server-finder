@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel=stylesheet type=text/css href="static/quickplay.css">
     <title>XLists</title>
 </head>
     <h1>Greylist</h1>
+<div id="xlist">
     <ul>
-        {% for item in greylist %}
-            <li>{{ item }}</li>
+        {% for xlist in greylist %}
+            <li>
+                <p>Name: {{ xlist.Server }}</p>
+                <p>Reason: {{ xlist.Reason }}</p>
+            </li>
         {% endfor %}
     </ul>
+</div>
 </body>
 </html>

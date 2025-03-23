@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel=stylesheet type=text/css href="static/quickplay.css">
+    <title>List of servers</title>
+</head>
+<body>
+    <h1>List of servers</h1>
+    <div id="server-list">
+    <ul>
+        {% for server in servers %}
+            <li>
+                <p>Server Name: {{ server.name }}</p>
+                <p>Players: {{ server.players }}</p>
+                <p>IP: {{ server.addr }}</p>
+                <p>Map: {{ server.map }}</p>
+                <p>Region: {{ server.region }}</p>
+                 {% if server.greylisted %}
+                    <p style="color: red;">Warning: This server is greylisted. Reason: {{ server.reason }}</p>
+                {% endif %}
+                <button onclick="connectServer('{{ server.addr }}')">Connect</button>
+            </li>
+        {% endfor %}
+    </ul>
+        </div>
+
+    <script>
+        function connectServer(ip) {
+            fetch('/connect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ip: ip }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

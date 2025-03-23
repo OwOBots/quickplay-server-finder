@@ -2,5 +2,9 @@
   {
     "Server": "castaway.tf",
     "Reason": "Server Network"
+  },
+  {
+    "Server": "Manns Private",
+    "Reason": "Server Network"
   }
 ]

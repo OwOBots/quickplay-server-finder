@@ -54,3 +54,74 @@ button:hover {
     margin: 5px 0;
     font inherit;
 }
+
+#server-list {
+    margin-top: 30px;
+    width: 90%;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    overflow: auto;
+}
+
+#server-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#server-list li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+#server-list li p {
+    margin: 5px 0;
+}
+
+#server-list li button {
+    background-color: #008000; /* green */
+    border: 1px solid #ddd;
+    color: white;
+    padding: 10px 20px;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+
+}
+
+#server-list li button:hover {
+    background-color: #0056b3;
+}
+
+#xlist {
+    margin-top: 30px;
+    width: 80%;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+#xlist ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#xlist li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+#xlist li p {
+    margin: 5px 0;
+}

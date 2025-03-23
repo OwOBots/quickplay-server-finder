@@ -6,7 +6,6 @@ from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
-
 limit = 20
 
 # 2 world regions are listed because the region code -1 and 225 is used
@@ -64,16 +63,17 @@ def get_servers():
         for server in sorted_servers:
             server_name = server["name"]
             # Check if the server name contains any forbidden words
-            if fuzz.partial_ratio(server_name, blacklist) > 80:
+            if any(fuzz.partial_ratio(server_name, item) > 80 for item in blacklist):
+                continue
                 # If the server name contains any forbidden words, skip it
                 # and continue to the next server
                 # we hide the server name to prevent the user from seeing it
                 # and to prevent the user from connecting to it
-                continue
-            if fuzz.partial_ratio(server_name, greylist) > 80:
+            greylisted_server = next((item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None)
+            if greylisted_server:
                 selected_server = server
-                # greylisted servers are not preferred but are still valid so we will return a warning message instead
                 selected_server["greylisted"] = True
+                selected_server["reason"] = greylisted_server["Reason"]
                 break
             if server["players"] < server["max_players"]:
                 selected_server = server
@@ -113,6 +113,28 @@ def connect_server():
         subprocess.run(["xdg-open", cmd], shell=False) '''
     
     return jsonify({"url": cmd}), 200
+
+
+@app.route("/server_list")
+def server_list():
+    try:
+        servers = TrueQuickplayServers()
+        blacklist = load_blacklist()
+        greylist = load_greylist()
+        for server in servers:
+            server_name = server["name"]
+            if any(fuzz.partial_ratio(server_name, item) > 80 for item in blacklist):
+                server["blacklisted"] = True
+            greylisted_server = next((item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None)
+            if greylisted_server:
+                server["greylisted"] = True
+                server["reason"] = greylisted_server["Reason"]
+         
+        return render_template("server_list.html", servers=servers)
+    except IOError as e:
+        return jsonify({"error": f"An error occurred while reading the file: {e}"}), 500
+    except (KeyError, ValueError) as e:
+        return jsonify({"error": f"An error occurred while processing the data: {e}"}), 500
 
 
 @app.route("/rawjson")

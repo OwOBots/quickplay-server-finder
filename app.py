@@ -157,9 +157,11 @@ def xlists():
         greylist = load_greylist()
         return render_template("xlists.html", greylist=greylist)
     except IOError as e:
-        return jsonify({"error": f"An error occurred while reading the file: {e}"}), 500
+        app.logger.error(f"An IOError occurred while reading the file: {e}")
+        return jsonify({"error": "An internal error has occurred while reading the file."}), 500
     except (KeyError, ValueError) as e:
-        return jsonify({"error": f"An error occurred while processing the data: {e}"}), 500
+        app.logger.error(f"An error occurred while processing the data: {e}")
+        return jsonify({"error": "An internal error has occurred while processing the data."}), 500
 
 
 if __name__ == "__main__":

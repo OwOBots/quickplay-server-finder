@@ -81,6 +81,7 @@ def get_servers():
                 break
         
         if selected_server is None:
+            app.logger.error("No servers found")
             return jsonify({"message": "No servers found"}), 404
         else:
             return jsonify(selected_server)
@@ -132,9 +133,11 @@ def server_list():
          
         return render_template("server_list.html", servers=servers)
     except IOError as e:
-        return jsonify({"error": f"An error occurred while reading the file: {e}"}), 500
+        app.logger.error(f"An IOError occurred while reading the file: {e}")
+        return jsonify({"error": f"An error occurred while reading the file"}), 500
     except (KeyError, ValueError) as e:
-        return jsonify({"error": f"An error occurred while processing the data: {e}"}), 500
+        app.logger.error(f"An error occurred while processing the data: {e}")
+        return jsonify({"error": f"An error occurred while processing the data"}), 500
 
 
 @app.route("/rawjson")
@@ -143,10 +146,12 @@ def rawjson():
         json_data = json.dumps(TrueQuickplayServers(), indent=4, sort_keys=True)
         return json_data
     except IOError as e:
-        return jsonify({"error": f"An error occurred while reading the file: {e}"}), 500
+        app.logger.error(f"An IOError occurred while reading the file: {e}")
+        return jsonify({"error": f"An error occurred while reading the file"}), 500
     except (KeyError, ValueError) as e:
+        app.logger.error(f"An error occurred while processing the data: {e}")
         return (
-            jsonify({"error": f"An error occurred while processing the data: {e}"}),
+            jsonify({"error": f"An error occurred while processing the data"}),
             500,
             )
 

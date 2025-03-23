@@ -6,7 +6,9 @@ from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
-limit = 20
+
+# TODO: make this a configuration option
+limit = 50
 
 # 2 world regions are listed because the region code -1 and 225 is used
 region_names = {
@@ -132,7 +134,7 @@ def server_list():
             if greylisted_server:
                 server["greylisted"] = True
                 server["reason"] = greylisted_server["Reason"]
-         
+        
         return render_template("server_list.html", servers=servers)
     except IOError as e:
         app.logger.error(f"An IOError occurred while reading the file: {e}")
@@ -169,6 +171,7 @@ def xlists():
     except (KeyError, ValueError) as e:
         app.logger.error(f"An error occurred while processing the data: {e}")
         return jsonify({"error": "An internal error has occurred while processing the data."}), 500
+
 
 
 if __name__ == "__main__":

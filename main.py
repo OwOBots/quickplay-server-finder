@@ -8,13 +8,16 @@ import json
 # change this to the number of servers you want to query
 limit = 20
 
+
 def load_blacklist():
-    with open('forbidden-words/eng', 'r') as f:
+    with open('blacklist.json', 'r') as f:
         return json.load(f)
+
 
 def load_greylist():
     with open('greylist.json', 'r') as f:
         return json.load(f)
+
 
 def TrueQuickplayServers():
     servers_info = []
@@ -68,11 +71,16 @@ def main():
                             subprocess.run(["cmd", "/c", "start", cmd], shell=False)
                         else:
                             subprocess.run(["xdg-open", cmd], shell=False)
+                
                 if server in load_greylist():
                     greylist_reason = server['Reason']
-                    greylist_prompt = input(f"{server_name} is grey-listed because of: {greylist_reason}, do you want to connect to it?")
+                    greylist_prompt = input(
+                        f"{server_name} is grey-listed because of: {greylist_reason}, do you want to connect to it?"
+                        )
                     if greylist_prompt == 'y':
                         server_connect()
+                elif server in load_blacklist():
+                    print(f"Server is blacklisted, skipping...")
                 else:
                     server_connect()
     

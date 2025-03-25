@@ -6,12 +6,20 @@ from steam import client as gs
 import json
 from fuzzywuzzy import fuzz
 import subprocess
+import atexit
 
 app = Flask(__name__)
+# security
+# Ensure the cache directory exists
+cache_dir = "cache/flask_cache"
+if not os.path.exists(cache_dir):
+    os.makedirs(cache_dir)
 
+cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
+atexit.register(cache.clear)
 # TODO: make this a configuration option
 limit = 50
-cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': '/tmp/flask_cache'})
+
 # 2 world regions are listed because the region code -1 and 225 is used
 region_names = {
     -1: "World",
@@ -221,3 +229,4 @@ def git():
 
 if __name__ == "__main__":
     app.run(debug=False)
+    

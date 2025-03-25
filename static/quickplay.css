@@ -31,7 +31,7 @@ button {
     padding: 10px 20px;
     font: inherit;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0px;
     margin-top: 20px;
 }
 
@@ -45,7 +45,7 @@ button:hover {
     padding: 10px;
     background-color: white;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 0px;
     width: 300px;
     text-align: left;
 }
@@ -73,7 +73,7 @@ button:hover {
 #server-list li {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 0px;
     margin-bottom: 10px;
     padding: 10px;
     overflow: hidden;
@@ -90,7 +90,7 @@ button:hover {
     padding: 10px 20px;
     font: inherit;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0px;
     margin-top: 10px;
 
 }
@@ -141,10 +141,20 @@ button:hover {
     padding: 10px 20px;
     font: inherit;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0px;
     margin-top: 10px;
 }
 
 #github button:hover {
     background-color: #880088;
 }
+
+#hash {
+margin-top: 30px;
+    font inherit;
+    background-color: #ff4444;
+    border: 1px solid #ddd;
+    color: white;
+    width: 500px;
+    text-align: center;
+    }

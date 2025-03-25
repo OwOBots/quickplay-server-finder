@@ -1,15 +1,17 @@
 import os
+
 from flask import Flask, jsonify, request, render_template
+from flask_caching import Cache
 from steam import client as gs
 import json
 from fuzzywuzzy import fuzz
+import subprocess
 
 app = Flask(__name__)
 
-
 # TODO: make this a configuration option
 limit = 50
-
+cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': '/tmp/flask_cache'})
 # 2 world regions are listed because the region code -1 and 225 is used
 region_names = {
     -1: "World",
@@ -54,6 +56,7 @@ def index():
 
 
 @app.route("/servers", methods=["GET"])
+@cache.cached(timeout=60)
 def get_servers():
     try:
         servers = TrueQuickplayServers()
@@ -71,7 +74,9 @@ def get_servers():
                 # and continue to the next server
                 # we hide the server name to prevent the user from seeing it
                 # and to prevent the user from connecting to it
-            greylisted_server = next((item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None)
+            greylisted_server = next(
+                (item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None
+                )
             if greylisted_server:
                 selected_server = server
                 selected_server["greylisted"] = True
@@ -121,6 +126,7 @@ def connect_server():
 
 
 @app.route("/server_list")
+@cache.cached(timeout=60)
 def server_list():
     try:
         servers = TrueQuickplayServers()
@@ -130,7 +136,9 @@ def server_list():
             server_name = server["name"]
             if any(fuzz.partial_ratio(server_name, item) > 80 for item in blacklist):
                 server["blacklisted"] = True
-            greylisted_server = next((item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None)
+            greylisted_server = next(
+                (item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None
+                )
             if greylisted_server:
                 server["greylisted"] = True
                 server["reason"] = greylisted_server["Reason"]
@@ -145,6 +153,7 @@ def server_list():
 
 
 @app.route("/rawjson")
+@cache.cached(timeout=60)
 def rawjson():
     try:
         json_data = json.dumps(TrueQuickplayServers(), indent=4, sort_keys=True)
@@ -161,6 +170,7 @@ def rawjson():
 
 
 @app.route("/xlists")
+@cache.cached(timeout=60)
 def xlists():
     try:
         greylist = load_greylist()
@@ -172,6 +182,41 @@ def xlists():
         app.logger.error(f"An error occurred while processing the data: {e}")
         return jsonify({"error": "An internal error has occurred while processing the data."}), 500
 
+
+@app.route("/git", methods=["POST"])
+def git():
+    try:
+        git_hash_file = "git_hash.txt"
+        current_git_hash = None
+        
+        # Check if the git_hash.txt file exists
+        if os.path.exists(git_hash_file):
+            with open(git_hash_file, "r") as f:
+                cached_git_hash = f.read().strip()
+            
+            # Get the current Git hash
+            result = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True, shell=False
+                )
+            current_git_hash = result.stdout.strip()
+            
+            # If the cached hash is different from the current hash, update the cache
+            if cached_git_hash != current_git_hash:
+                with open(git_hash_file, "w") as f:
+                    f.write(current_git_hash)
+        else:
+            # If the file does not exist, get the current Git hash and create the file
+            result = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True, shell=False
+                )
+            current_git_hash = result.stdout.strip()
+            with open(git_hash_file, "w") as f:
+                f.write(current_git_hash)
+        
+        return jsonify({"git_hash": current_git_hash}), 200
+    except subprocess.CalledProcessError as e:
+        app.logger.error(f"An error occurred while getting the git hash: {e}")
+        return jsonify({"error": "An error occurred while getting the git hash"}), 500
 
 
 if __name__ == "__main__":

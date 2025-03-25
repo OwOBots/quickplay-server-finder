@@ -36,7 +36,20 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        function connectServer(ip) {
+        function git() {
+            fetch('/git', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('githash').innerText = data.git_hash;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+                function connectServer(ip) {
             fetch('/connect', {
                 method: 'POST',
                 headers: {
@@ -47,18 +60,23 @@
             .then(response => response.json())
             .then(data => {
                 if (data.url) {
-                window.open(data.url, '_blank');
+                    window.open(data.url, '_blank');
                 } else {
-                 alert(data.message);
+                    alert(data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
         }
+        window.onload = git;
 
     </script>
     <div id="github">
 <a href="https://github.com/OwOBots/quickplay-server-finder"><button>Source Code (redirects to github)</button></a>
 <a href="https://discord.gg/pnBbJg2tZf"><button>True Quickplay Discord (redirects to discord)</button></a>
 </div>
+    <div id="hash">
+        <p>Current Git Hash: <span id="githash"></span></p>
+    </div>
+
 </body>
 </html>

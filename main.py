@@ -4,6 +4,7 @@ import os
 import subprocess
 from steam import client as gs
 import json
+import a2s
 
 # change this to the number of servers you want to query
 limit = 20
@@ -55,12 +56,15 @@ def main():
                 print("No servers found")
             else:
                 # Find the server with the most players
-                max_players = max(data, key=lambda x: x['max_players'])
                 most_players_server = max(data, key=lambda x: x['players'])
                 player_count = most_players_server['players']
-                ip = most_players_server['addr']
+                ip, port = most_players_server['addr'].split(':')
+                port = int(port)
+                # Hacky way to convert the ip to a tuple
+                ip_tupple = (ip,port)
                 server_name = most_players_server['name']
-                print("Server with the most players:", server_name, "with", player_count, "players online", "at", ip)
+                ping_ms = round(a2s.info(ip_tupple, timeout=20).ping * 1000)
+                print("Server with the most players:", server_name, "with", player_count, "players online", "at", ip,"with a ping of", ping_ms)
                 
                 def server_connect():
                     server_connect_prompt = input("Would you like to connect to this server? (y/N): ")

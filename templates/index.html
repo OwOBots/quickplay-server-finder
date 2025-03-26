@@ -28,7 +28,8 @@
                             <p>IP: ${data.addr}</p>
                             <p>Map: ${data.map}</p>
                             <p>Region: ${data.region}</p>
-                            <p>Greylisted: ${data.greylisted ? 'Yes' : 'No'} ${data.greylisted ? ': Reason ' + data.reason : ''}</p>
+                            <p>Ping: ${data.ping}</p>
+                            <p style="color: ${data.greylisted ? 'red' : 'black'};">Greylisted: ${data.greylisted ? 'Yes' : 'No'} ${data.greylisted ? ': Reason ' + data.reason : ''}</p>
                             <button onclick="connectServer('${data.addr}')">Connect</button>
                         `;
                     }

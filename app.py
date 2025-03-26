@@ -1,9 +1,13 @@
 import os
-
+# flask
 from flask import Flask, jsonify, request, render_template
 from flask_caching import Cache
+# steam
 from steam import client as gs
+from steam import game_servers as lgs
+import a2s
 import json
+# fuzzywuzzy
 from fuzzywuzzy import fuzz
 import subprocess
 import atexit
@@ -33,6 +37,15 @@ region_names = {
     7: "Africa",
     255: "World"
     }
+
+
+async def asyncServerPing(server):
+    # Calculate ping
+    ip, port = server["addr"].split(":")
+    port = int(port)
+    ip_tuple = (ip, port)
+    server_info = await a2s.ainfo(ip_tuple, timeout=20, encoding=None)
+    server["ping"] = round(server_info.ping * 1000)
 
 
 def load_blacklist():
@@ -65,7 +78,7 @@ def index():
 
 @app.route("/servers", methods=["GET"])
 @cache.cached(timeout=60)
-def get_servers():
+async def get_servers():
     try:
         servers = TrueQuickplayServers()
         sorted_servers = sorted(servers, key=lambda x: x["players"], reverse=True)
@@ -73,6 +86,7 @@ def get_servers():
         greylist = load_greylist()
         
         selected_server = None
+        
         for server in sorted_servers:
             server_name = server["name"]
             # Check if the server name contains any forbidden words
@@ -99,8 +113,8 @@ def get_servers():
             app.logger.error("No servers found")
             return jsonify({"message": "No servers found"}), 404
         else:
+            await asyncServerPing(selected_server)
             return jsonify(selected_server)
-    
     
     except IOError as e:
         app.logger.error(f"An IOError occurred while reading the file: {e}")
@@ -119,16 +133,7 @@ def connect_server():
     ip = data.get("ip")
     if not ip:
         return jsonify({"error": "IP address is required"}), 400
-    # This code is commented out because it's wont work in a web server
-    # so we will just use the web browser built-in function to open the link
-    
     cmd = f"steam://connect/{ip}"
-    
-    ''' cmd = f"steam://connect/{ip}"
-    if os.name == "nt":
-        subprocess.run(["cmd", "/c", "start", cmd], shell=False)
-    else:
-        subprocess.run(["xdg-open", cmd], shell=False) '''
     
     return jsonify({"url": cmd}), 200
 
@@ -150,6 +155,7 @@ def server_list():
             if greylisted_server:
                 server["greylisted"] = True
                 server["reason"] = greylisted_server["Reason"]
+            
         
         return render_template("server_list.html", servers=servers)
     except IOError as e:
@@ -229,4 +235,3 @@ def git():
 
 if __name__ == "__main__":
     app.run(debug=False)
-    

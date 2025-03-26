@@ -175,4 +175,4 @@ cython_debug/
 
 #somehow the way im testing css code wont work if i dont include this in the template folder so for no duplicate files i will include this in the gitignore
 templates/static
-/cache/*
+/cache/flask_cache

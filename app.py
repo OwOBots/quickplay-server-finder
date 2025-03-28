@@ -25,7 +25,7 @@ app = Flask(__name__)
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
-if cfg is None:
+if cfg is cfg.get("Cache", "type") == "FileSystemCache":
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 else:
     if cfg.get("Cache", "type") == "MemcachedCache":
@@ -36,7 +36,7 @@ else:
 # if the cache is FileSystemCache, we need to clear it on exit
 # this is a workaround for the fact that FileSystemCache does not clear on exit
 # if we use redis or memcached, we don't need to do this
-if cfg is None or cfg.get("Cache", "type") == "FileSystemCache":
+if cfg is cfg.get("Cache", "type") == "FileSystemCache":
     atexit.register(cache.clear)
 
 if cfg is None:

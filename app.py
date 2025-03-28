@@ -14,6 +14,7 @@ import subprocess
 import atexit
 # config
 import configparser
+import pylibmc
 
 cfg = configparser.ConfigParser()
 
@@ -28,7 +29,8 @@ if not os.path.exists(cache_dir):
 if cfg.get("Cache", "type") == "FileSystemCache":
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 elif cfg.get("Cache", "type") == "MemcachedCache":
-    cache = Cache(app, config={'CACHE_TYPE': cfg.get("Cache", "type")})
+    servers = cfg.get("Cache", "servers").split(',')
+    cache = Cache(app, config={'CACHE_TYPE': cfg.get("Cache", "type"), 'CACHE_MEMCACHED_SERVERS': servers})
 else:
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 # if the cache is FileSystemCache, we need to clear it on exit

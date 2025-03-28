@@ -14,7 +14,6 @@ import subprocess
 import atexit
 # config
 import configparser
-import pylibmc
 
 cfg = configparser.ConfigParser()
 

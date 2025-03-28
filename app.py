@@ -10,19 +10,39 @@ import json
 # fuzzywuzzy
 from fuzzywuzzy import fuzz
 import subprocess
+# cache clear on exit
 import atexit
+# config
+import configparser
 
-app = Flask(__name__)
-# security
-# Ensure the cache directory exists
+cfg = configparser.ConfigParser()
+
+cfg.read("config.ini")
+# LEGACY: Set the cache directory
 cache_dir = "cache/flask_cache"
+app = Flask(__name__)
+
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
-cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
-atexit.register(cache.clear)
-# TODO: make this a configuration option
-limit = 50
+if cfg is None:
+    cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
+else:
+    if cfg.get("Cache", "type") == "MemcachedCache":
+        import pylibmc
+    # use pylibmc if available
+    cache = Cache(app, config={'CACHE_TYPE': cfg.get("Cache", "type")})
+
+# if the cache is FileSystemCache, we need to clear it on exit
+# this is a workaround for the fact that FileSystemCache does not clear on exit
+# if we use redis or memcached, we don't need to do this
+if cfg is None or cfg.get("Cache", "type") == "FileSystemCache":
+    atexit.register(cache.clear)
+
+if cfg is None:
+    limit = 50
+else:
+    limit = cfg.getint("Main", "limit")
 
 # 2 world regions are listed because the region code -1 and 225 is used
 region_names = {
@@ -41,6 +61,8 @@ region_names = {
 
 async def asyncServerPing(server):
     # Calculate ping
+    # steam has a way to get ping, but it's not very reliable
+    # so we use a2s instead
     ip, port = server["addr"].split(":")
     port = int(port)
     ip_tuple = (ip, port)
@@ -155,7 +177,6 @@ def server_list():
             if greylisted_server:
                 server["greylisted"] = True
                 server["reason"] = greylisted_server["Reason"]
-            
         
         return render_template("server_list.html", servers=servers)
     except IOError as e:

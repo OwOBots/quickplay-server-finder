@@ -14,6 +14,8 @@ import subprocess
 import atexit
 # config
 import configparser
+import pylibmc
+
 
 cfg = configparser.ConfigParser()
 
@@ -28,7 +30,8 @@ if not os.path.exists(cache_dir):
 if cfg.get("Cache", "type") == "FileSystemCache":
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 elif cfg.get("Cache", "type") == "MemcachedCache":
-    cache = Cache(app, config={'CACHE_TYPE': "MemcachedCache"})
+    servers = ["127.0.0.1:11211"]
+    cache = Cache(app, config={'CACHE_TYPE': "MemcachedCache", 'CACHE_MEMCACHED_SERVERS': servers})
 else:
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 # if the cache is FileSystemCache, we need to clear it on exit
@@ -38,10 +41,7 @@ else:
 if cfg.get("Cache", "type") == "FileSystemCache":
     atexit.register(cache.clear)
 
-if cfg is None:
-    limit = 50
-else:
-    limit = cfg.getint("Main", "limit")
+limit = cfg.getint("Main", "limit")
 
 # 2 world regions are listed because the region code -1 and 225 is used
 region_names = {

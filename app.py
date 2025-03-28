@@ -29,9 +29,7 @@ if cfg is cfg.get("Cache", "type") == "FileSystemCache":
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 else:
     if cfg.get("Cache", "type") == "MemcachedCache":
-        import pylibmc
-    # use pylibmc if available
-    cache = Cache(app, config={'CACHE_TYPE': cfg.get("Cache", "type")})
+        cache = Cache(app, config={'CACHE_TYPE': cfg.get("Cache", "type")})
 
 # if the cache is FileSystemCache, we need to clear it on exit
 # this is a workaround for the fact that FileSystemCache does not clear on exit

@@ -35,6 +35,7 @@ else:
 # if the cache is FileSystemCache, we need to clear it on exit
 # this is a workaround for the fact that FileSystemCache does not clear on exit
 # if we use redis or memcached, we don't need to do this
+#
 if cfg.get("Cache", "type") == "FileSystemCache":
     atexit.register(cache.clear)
 

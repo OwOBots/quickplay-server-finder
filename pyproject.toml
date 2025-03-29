@@ -1,0 +1,14 @@
+[project]
+name = "quickplay"
+version = "0.1.0"
+description = "True QuickPlay Server finder"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask-caching==2.3.1",
+    "flask[async]==3.1.0",
+    "fuzzywuzzy==0.18.0",
+    "pylibmc==1.6.3",
+    "python-a2s==1.4.1",
+    "steam[client]==1.4.4",
+]

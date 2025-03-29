@@ -61,10 +61,11 @@ def main():
                 ip, port = most_players_server['addr'].split(':')
                 port = int(port)
                 # Hacky way to convert the ip to a tuple
-                ip_tupple = (ip,port)
+                ip_tupple = (ip, port)
                 server_name = most_players_server['name']
-                ping_ms = round(a2s.info(ip_tupple, timeout=20).ping * 1000)
-                print("Server with the most players:", server_name, "with", player_count, "players online", "at", ip,"with a ping of", ping_ms)
+                ping_ms = round(a2s.info(ip_tupple, timeout=20, encoding='str').ping * 1000)
+                print("Server with the most players:", server_name, "with", player_count, "players online", "at", ip,
+                      "with a ping of", ping_ms)
                 
                 def server_connect():
                     server_connect_prompt = input("Would you like to connect to this server? (y/N): ")

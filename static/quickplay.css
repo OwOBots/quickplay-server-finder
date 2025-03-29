@@ -158,3 +158,18 @@ margin-top: 30px;
     width: 500px;
     text-align: center;
     }
+
+#ham-images-container {
+    margin-top: 30px;
+    font inherit;
+    background-color: #ff4444;
+    border: 1px solid #ddd;
+    color: white;
+    width: 500px;
+    text-align: center;
+}
+
+#ham-images-container img {
+    max-width: 500px;
+    height: auto;
+}

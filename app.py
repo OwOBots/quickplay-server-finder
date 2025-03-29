@@ -1,10 +1,10 @@
+import base64
 import os
 # flask
 from flask import Flask, jsonify, request, render_template
 from flask_caching import Cache
 # steam
 from steam import client as gs
-from steam import game_servers as lgs
 import a2s
 import json
 # fuzzywuzzy
@@ -15,7 +15,22 @@ import atexit
 # config
 import configparser
 import pylibmc
+import sqlite3
 
+
+def cleardb():
+    # do it exist?
+    if not os.path.exists("ham.db"):
+        return
+    # clear the database
+    conn = sqlite3.connect("ham.db")
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS ham")
+    conn.commit()
+    conn.close()
+
+
+atexit.register(cleardb)
 
 cfg = configparser.ConfigParser()
 
@@ -93,6 +108,7 @@ def TrueQuickplayServers():
 
 
 @app.route("/")
+@cache.cached(timeout=3600)
 def index():
     return render_template("index.html")
 
@@ -113,10 +129,10 @@ async def get_servers():
             # Check if the server name contains any forbidden words
             if any(fuzz.partial_ratio(server_name, item) > 80 for item in blacklist):
                 continue
-                # If the server name contains any forbidden words, skip it
-                # and continue to the next server
-                # we hide the server name to prevent the user from seeing it
-                # and to prevent the user from connecting to it
+            # If the server name contains any forbidden words, skip it
+            # and continue to the next server
+            # we hide the server name to prevent the user from seeing it
+            # and to prevent the user from connecting to it
             greylisted_server = next(
                 (item for item in greylist if fuzz.partial_ratio(server_name, item["Server"]) > 80), None
                 )
@@ -251,6 +267,61 @@ def git():
     except subprocess.CalledProcessError as e:
         app.logger.error(f"An error occurred while getting the git hash: {e}")
         return jsonify({"error": "An error occurred while getting the git hash"}), 500
+
+
+# hacky way to cache the images because pylibmc is gay and will not work
+hamcache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
+atexit.register(hamcache.clear)
+
+
+@app.route("/hampics", methods=["GET"])
+@hamcache.cached(timeout=30)
+def ham_images():
+    try:
+        pic_ham = "images"
+        # get the list of ham pics
+        # if the directory does not exist, create it
+        if not os.path.exists(pic_ham):
+            os.makedirs(pic_ham)
+        # initialize the database
+        conn = sqlite3.connect("ham.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS ham (id INTEGER PRIMARY KEY, image TEXT)"
+            )
+        cursor.execute("SELECT COUNT(*) FROM ham")
+        # add the images to the database
+        images = [
+            (sqlite3.Binary(open(os.path.join(pic_ham, filename), 'rb').read()),)
+            for filename in os.listdir(pic_ham)
+            if filename.endswith(".jpg") or filename.endswith(".png")
+            ]
+        cursor.executemany("INSERT INTO ham (image) VALUES (?)", images)
+        conn.commit()
+        
+        # fetch a random image from the database
+        cursor.execute("SELECT image FROM ham ORDER BY RANDOM() LIMIT 1")
+        rows = cursor.fetchall()
+        conn.close()
+        
+        # jsonify the images
+        ham_pics = [base64.b64encode(row[0]).decode('utf-8') for row in rows]
+        return jsonify({"ham_pics": ham_pics})
+    except sqlite3.Error as e:
+        app.logger.error(f"An error occurred with the database: {e}")
+        return jsonify({"error": "An error occurred with the database"}), 500
+    except OSError as e:
+        app.logger.error(f"An OS error occurred: {e}")
+        return jsonify({"error": "An OS error occurred"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
+
+@app.route("/ham")
+def ham():
+    # god im hungry
+    return render_template("ham.html")
 
 
 if __name__ == "__main__":

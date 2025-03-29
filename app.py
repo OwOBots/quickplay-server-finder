@@ -30,8 +30,8 @@ if not os.path.exists(cache_dir):
 if cfg.get("Cache", "type") == "FileSystemCache":
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 elif cfg.get("Cache", "type") == "MemcachedCache":
-    servers = ["127.0.0.1:11211"]
-    cache = Cache(app, config={'CACHE_TYPE': "MemcachedCache", 'CACHE_MEMCACHED_SERVERS': servers})
+    memservers = ["127.0.0.1:11211"]
+    cache = Cache(app, config={'CACHE_TYPE': "MemcachedCache", 'CACHE_MEMCACHED_SERVERS': memservers})
 else:
     cache = Cache(app, config={'CACHE_TYPE': 'FileSystemCache', 'CACHE_DIR': f'{cache_dir}'})
 # if the cache is FileSystemCache, we need to clear it on exit

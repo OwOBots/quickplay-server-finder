@@ -324,7 +324,7 @@ def ham():
     return render_template("ham.html")
 
 
-@app.route("/health_check")
+@app.route("/health_check", methods=["GET"])
 def health_check():
     # Health check endpoint
     return jsonify({"status": "ok"}), 200

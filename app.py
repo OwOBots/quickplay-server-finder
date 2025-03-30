@@ -324,5 +324,11 @@ def ham():
     return render_template("ham.html")
 
 
+@app.route("/health_check")
+def health_check():
+    # Health check endpoint
+    return jsonify({"status": "ok"}), 200
+
+
 if __name__ == "__main__":
     app.run(debug=False)

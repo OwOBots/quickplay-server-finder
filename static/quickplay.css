@@ -173,3 +173,32 @@ margin-top: 30px;
     max-width: 500px;
     height: auto;
 }
+
+
+#pages a {
+    text-decoration: none;
+    color: #000; /* black text */
+    padding: 10px 20px;
+    border: 2px solid #000; /* black border */
+    border-radius: 5px; /* rounded corners */
+}
+
+#pages a:hover {
+    background-color: #000; /* black background */
+    color: #fff; /* white text */
+}
+
+#loading {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1a1a1a; /* Dark gray background */
+    color: #e0e0e0; /* Light gray text */
+    padding: 20px;
+    border: 2px solid #e0e0e0; /* Light gray border */
+    font-size: 18px;
+    text-align: center;
+    z-index: 1000;
+}

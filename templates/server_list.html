@@ -23,6 +23,16 @@
             </li>
         {% endfor %}
     </ul>
+
+        <div id="pages">
+        {% if page > 1 %}
+            <a href="{{ url_for('server_list', page=page-1, per_page=per_page) }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page }}</span>
+        {% if page * per_page < total_servers %}
+            <a href="{{ url_for('server_list', page=page+1, per_page=per_page) }}">Next</a>
+        {% endif %}
+            </div>
         </div>
 
     <script>

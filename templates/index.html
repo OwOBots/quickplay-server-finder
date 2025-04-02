@@ -12,12 +12,15 @@
     <a href="/server_list"><button>View All Servers</button></a>
     <a href="/xlists"><button>View Greylist</button></a>
     <div id="server-info"></div>
+    <div id="loading" style="display: none;">Loading...</div>
 
     <script>
         function fetchServer() {
+        document.getElementById('loading').style.display = 'block';
             fetch('/servers')
                 .then(response => response.json())
                 .then(data => {
+                document.getElementById('loading').style.display = 'none';
                     if (data.message) {
                         document.getElementById('server-info').innerText = data.message;
                     } else {
@@ -34,7 +37,10 @@
                         `;
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    console.error('Error:', error);
+                     });
         }
 
         function git() {

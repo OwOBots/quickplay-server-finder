@@ -179,6 +179,8 @@ def connect_server():
 @cache.cached(timeout=60)
 def server_list():
     try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
         servers = TrueQuickplayServers()
         blacklist = load_blacklist()
         greylist = load_greylist()
@@ -192,8 +194,12 @@ def server_list():
             if greylisted_server:
                 server["greylisted"] = True
                 server["reason"] = greylisted_server["Reason"]
+        total_servers = len(servers)
+        start = (page - 1) * per_page
+        end = start + per_page
+        paginated_servers = servers[start:end]
         
-        return render_template("server_list.html", servers=servers)
+        return render_template("server_list.html", servers=paginated_servers, page=page, per_page=per_page, total_servers=total_servers)
     except IOError as e:
         app.logger.error(f"An IOError occurred while reading the file: {e}")
         return jsonify({"error": f"An error occurred while reading the file"}), 500
@@ -328,6 +334,7 @@ def ham():
 def health_check():
     # Health check endpoint
     return jsonify({"status": "ok"}), 200
+
 
 
 if __name__ == "__main__":

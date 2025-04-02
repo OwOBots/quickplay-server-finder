@@ -176,7 +176,6 @@ def connect_server():
 
 
 @app.route("/server_list")
-@cache.cached(timeout=60)
 def server_list():
     try:
         page = int(request.args.get('page', 1))

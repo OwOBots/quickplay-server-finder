@@ -198,7 +198,8 @@ def server_list():
         end = start + per_page
         paginated_servers = servers[start:end]
         
-        return render_template("server_list.html", servers=paginated_servers, page=page, per_page=per_page, total_servers=total_servers)
+        return render_template("server_list.html", servers=paginated_servers, page=page, per_page=per_page,
+                               total_servers=total_servers)
     except IOError as e:
         app.logger.error(f"An IOError occurred while reading the file: {e}")
         return jsonify({"error": f"An error occurred while reading the file"}), 500
@@ -334,6 +335,11 @@ def health_check():
     # Health check endpoint
     return jsonify({"status": "ok"}), 200
 
+
+@app.route("/load_balancer", methods=["POST"])
+def nameOfLoadBalancer():
+    lbn = cfg.get("LB", "lb_name")
+    return jsonify({"LB": lbn}), 200
 
 
 if __name__ == "__main__":

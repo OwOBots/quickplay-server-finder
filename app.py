@@ -1,10 +1,14 @@
 import base64
 import os
+
+import steam.webapi
 # flask
 from flask import Flask, jsonify, request, render_template
+from flask.cli import load_dotenv
 from flask_caching import Cache
 # steam
-from steam import client as gs
+from steam import webapi as gs
+from steam.exceptions import SteamError
 import a2s
 import json
 # fuzzywuzzy
@@ -16,6 +20,8 @@ import atexit
 import configparser
 import pylibmc
 import sqlite3
+
+load_dotenv()
 
 
 def cleardb():
@@ -96,14 +102,25 @@ def load_greylist():
 
 def TrueQuickplayServers():
     servers_info = []
-    client = gs.SteamClient()
-    client.anonymous_login()
-    for server_addr in client.gameservers.get_server_list(
-            r"\appid\440\gametype\truequickplay\secure\1", max_servers=limit
-            ):
-        server_addr["region"] = region_names.get(server_addr["region"])
-        servers_info.append(server_addr)
-    client.logout()
+    try:
+        # Get the server list from the Steam API
+        key = os.environ.get("STEAM_API_KEY")
+        server_list = gs.webapi_request(
+            url=r"https://api.steampowered.com/IGameServersService/GetServerList/v1/",
+            method='GET',
+            caller=None,
+            params={
+                "key": key,
+                "filter": r"\appid\440\gametype\truequickplay\secure\1",
+                "limit": limit,
+            },
+        )
+        for server_addr in server_list.get("response", {}).get("servers", []):
+            server_addr["region"] = region_names.get(server_addr["region"])
+            servers_info.append(server_addr)
+    except SteamError as e:
+        app.logger.error(f"An error occurred while getting the server list: {e}")
+        return []
     return servers_info
 
 
@@ -115,10 +132,10 @@ def index():
 
 @app.route("/servers", methods=["GET"])
 @cache.cached(timeout=60)
-async def get_servers():
+def get_servers():
     try:
         servers = TrueQuickplayServers()
-        sorted_servers = sorted(servers, key=lambda x: x["players"], reverse=True)
+        sorted_servers = sorted(servers, key=lambda x: x["max_players"], reverse=True)
         blacklist = load_blacklist()
         greylist = load_greylist()
         
@@ -150,7 +167,7 @@ async def get_servers():
             app.logger.error("No servers found")
             return jsonify({"message": "No servers found"}), 404
         else:
-            await asyncServerPing(selected_server)
+            asyncServerPing(selected_server)
             return jsonify(selected_server)
     
     except IOError as e:

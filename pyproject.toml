@@ -12,5 +12,10 @@ dependencies = [
     "fuzzywuzzy==0.18.0",
     "pylibmc==1.6.3",
     "python-a2s==1.4.1",
+    "python-dotenv>=1.1.0",
+    "python-levenshtein>=0.27.1",
     "steam[client]==1.4.4",
 ]
+
+[tool.uv.sources]
+steam = { git = "https://github.com/solsticegamestudios/steam" }

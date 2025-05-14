@@ -2,10 +2,12 @@
 # CC0 1.0 Universal
 import os
 import subprocess
-from steam import client as gs
+from steam import webapi as gs
 import json
 import a2s
+import dotenv
 
+dotenv.load_dotenv()
 # change this to the number of servers you want to query
 limit = 20
 
@@ -22,13 +24,18 @@ def load_greylist():
 
 def TrueQuickplayServers():
     servers_info = []
-    client = gs.SteamClient()
-    client.anonymous_login()
-    for server_addr in client.gameservers.get_server_list(
-            r'\appid\440\gametype\truequickplay\secure\1', max_servers=limit
-            ):
-        servers_info.append(server_addr)
-    client.logout()
+    key = os.getenv('STEAM_API_KEY')
+    server_addr = gs.webapi_request(
+        url=r"https://api.steampowered.com/IGameServersService/GetServerList/v1/",
+        method='GET',
+        caller=None,
+        params={
+            "key": key,
+            "filter": r"\appid\440\gametype\truequickplay\secure\1",
+            "limit": limit,
+            },
+        )
+    servers_info.append(server_addr)
     return servers_info
 
 
@@ -44,7 +51,11 @@ def main():
         with open('quickplay_servers.json', 'r') as f:
             data = json.load(f)
             
-            sorted_servers = sorted(data, key=lambda x: x['players'], reverse=True)
+            sorted_servers = sorted(
+                [server for server in data if 'players' in server and 'max_players' in server],
+                key=lambda x: x['players'],
+                reverse=True
+                )
             
             selected_servers = None
             for server in sorted_servers:

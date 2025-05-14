@@ -1,26 +1,19 @@
 # how to use
 
-1. install the required dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
+1. [Install UV](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
 
-2. run the main script:
+2. Run the main script:
     ```sh
-    python main.py
+    uv run main.py
     ```
-
-thats it
+And that's it
 
 ## for local development of the web version
 
-1. install the required dependencies:
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+2. Run the app script:
     ```sh
-    pip install -r requirements.txt
+    uv run app.py
     ```
 
-2. start the web server:
-    ```sh
-    flask run 
-    ```
 

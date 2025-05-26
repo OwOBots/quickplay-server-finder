@@ -5,7 +5,7 @@ description = "True QuickPlay Server finder"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "cachetools==6.0.0b1",
+    "cachetools==6.0.0",
     "flask-caching==2.3.1",
     "flask-restplus>=0.13.0",
     "flask[async]==3.1.1",

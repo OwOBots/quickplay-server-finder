@@ -13,7 +13,7 @@ dependencies = [
     "pylibmc==1.6.3",
     "python-a2s==1.4.1",
     "python-dotenv>=1.1.0",
-    "python-levenshtein>=0.27.1",
+    "python-levenshtein>=0.27.3",
     "steam[client]==1.4.4",
 ]
 
